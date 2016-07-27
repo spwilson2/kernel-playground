@@ -4,7 +4,7 @@ d := $(dir)
 
 KERNEL_SRCS := $(wildcard $(d)*.c)
 KERNEL_OBJS := $(patsubst %.c,$(OBJDIR)%.o,$(KERNEL_SRCS))
-KERNEL_INCLUDE := $(d)include
+KERNEL_INCLUDE := -I$(d)include
 
 KERNEL_SUBSYSTEMS := $(filter-out %include %arch, $(shell find $(d) -mindepth 1 -maxdepth 1 -type d))
 KERNEL_SUBSYSTEMS += $(ARCH_DIR)
@@ -32,9 +32,11 @@ SUBSYSTEMS:=$(addsuffix /makefile.inc,$(KERNEL_SUBSYSTEMS))
 
 $(foreach subsystem,$(SUBSYSTEMS),$(eval $(call INCLUDE_template, $(subsystem))))
 
-$(OBJDIR)%.o:%.c
+$(OBJDIR)%.o: %.d %.c
+	$(CROSS_CC) $< -MM -MT $(patsubst %.d,%.o,$@) $(KERNEL_INCLUDE) >$@
 	$(CROSS_CC) $< -c -o $@ $(KERNEL_INCLUDE)
 
 CLEAN += $(KERNEL_OBJS) $(OBJDIR)kernel.out
 
 
+-include $(KERNEL_SRCS:%.c=$(OBJDIR)%.d)

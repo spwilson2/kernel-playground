@@ -1,5 +1,3 @@
-sp := $(sp).x
-dirstack_$(sp) := $(d)
 d := $(dir)
 
 ARCH_DIR := $(d)arch/$(ARCH)/
@@ -13,7 +11,6 @@ KERNEL_SUBSYSTEMS := $(filter-out %include %arch, $(shell find $(d) -mindepth 1 
 KERNEL_SUBSYSTEMS += $(ARCH_DIR)
 
 PHONY += arch kernel
-
 
 define INCLUDE_template
  dir= $(shell dirname $(1))

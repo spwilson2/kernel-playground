@@ -16,7 +16,8 @@ dir:=kernel/
 include kernel/makefile.inc
 
 ALL_SRCS += $(KERNEL_SRCS)
-ALL_DIRS += $(dir $(ALL_SRCS))
+ALL_SRC_DIRS += $(dir $(ALL_SRCS))
+ALL_DIRS += $(addprefix $(OBJDIR),$(ALL_SRC_DIRS))
 
 clean:
 	rm -rf $(CLEAN)
@@ -26,7 +27,7 @@ dist-clean:
 	rm -rf $(OBJDIR)
 
 ifndef NOMAKEDIR
-$(shell mkdir -p $(OBJDIR) $(addprefix $(OBJDIR),$(ALL_DIRS)))
+$(shell mkdir -p $(OBJDIR) $(ALL_DIRS))
 endif
 
 $(OBJDIR)%.o:%.c

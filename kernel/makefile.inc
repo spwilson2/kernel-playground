@@ -3,6 +3,8 @@ dirstack_$(sp) := $(d)
 d := $(dir)
 
 ARCH_DIR := $(d)arch/$(ARCH)/
+ARCH_OBJ_DIR := $(OBJDIR)$(ARCH)/
+ALL_DIRS += $(ARCH_OBJ_DIR)
 
 KERNEL_SRCS := $(wildcard $(d)*.c)
 KERNEL_INCLUDE := -I$(d)include
@@ -26,7 +28,7 @@ KERNEL_OBJS := $(patsubst %.c,$(OBJDIR)%.o,$(KERNEL_SRCS))
 
 CLEAN += $(KERNEL_OBJS) $(OBJDIR)kernel.out
 
-kernel: $(OBJDIR)kernel.out
+kernel: $(OBJDIR)kernel.out arch
 
 $(OBJDIR)kernel.out: $(KERNEL_OBJS)
 	$(CROSS_CC) $(KERNEL_OBJS) -o $@

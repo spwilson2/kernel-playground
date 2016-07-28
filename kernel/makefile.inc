@@ -2,41 +2,37 @@ sp := $(sp).x
 dirstack_$(sp) := $(d)
 d := $(dir)
 
+ARCH_DIR := $(d)arch/$(ARCH)/
+
 KERNEL_SRCS := $(wildcard $(d)*.c)
-KERNEL_OBJS := $(patsubst %.c,$(OBJDIR)%.o,$(KERNEL_SRCS))
 KERNEL_INCLUDE := -I$(d)include
 
 KERNEL_SUBSYSTEMS := $(filter-out %include %arch, $(shell find $(d) -mindepth 1 -maxdepth 1 -type d))
 KERNEL_SUBSYSTEMS += $(ARCH_DIR)
 
-ARCH_DIR := $(d)arch/$(ARCH)/
-
 PHONY += arch kernel
 
-kernel: $(OBJDIR)kernel.out
-
-$(OBJDIR)kernel.out: arch $(KERNEL_OBJS)
-	$(CROSS_CC) $(KERNEL_OBJS) -o $@
-
-arch:
-	$(eval dir := $(ARCH_DIR))
-	$(eval include $(ARCH_DIR)makefile.inc)
-	$(eval KERNEL_INCLUDE += $(addprefix -I$(ARCH_DIR),$(ARCH_INCLUDE)))
 
 define INCLUDE_template
- dir= $(shell dir $1) 
- include $1 
+ dir= $(shell dirname $(1))
+ include $(1)
 endef
 
 SUBSYSTEMS:=$(addsuffix /makefile.inc,$(KERNEL_SUBSYSTEMS))
 
 $(foreach subsystem,$(SUBSYSTEMS),$(eval $(call INCLUDE_template, $(subsystem))))
 
-$(OBJDIR)%.o: %.d %.c
-	$(CROSS_CC) $< -MM -MT $(patsubst %.d,%.o,$@) $(KERNEL_INCLUDE) >$@
-	$(CROSS_CC) $< -c -o $@ $(KERNEL_INCLUDE)
+KERNEL_OBJS := $(patsubst %.c,$(OBJDIR)%.o,$(KERNEL_SRCS))
 
 CLEAN += $(KERNEL_OBJS) $(OBJDIR)kernel.out
 
+kernel: $(OBJDIR)kernel.out
+
+$(OBJDIR)kernel.out: $(KERNEL_OBJS)
+	$(CROSS_CC) $(KERNEL_OBJS) -o $@
+
+$(OBJDIR)%.o: %.c
+	$(CROSS_CC) $< -MM -MT $(patsubst %.d,%.o,$@) $(KERNEL_INCLUDE) >$@
+	$(CROSS_CC) $< -c -o $@ $(KERNEL_INCLUDE)
 
 -include $(KERNEL_SRCS:%.c=$(OBJDIR)%.d)

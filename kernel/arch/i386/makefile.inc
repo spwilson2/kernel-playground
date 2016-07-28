@@ -1,10 +1,12 @@
 sp := $(sp).x
 dirstack_$(sp) := $(d)
-d := $(dir)
+d := $(dir)/
 
-ARCH_INCLUDE := include
+ARCH_INCLUDE += include
+KERNEL_INCLUDE += -I$(d)include
 
 ARCH_SRCS := $(wildcard $(d)*.c)
 
-#$(OBJDIR)$(d)%.d:$(d)%.c
-#	$(CROSS_CC) $< -MM -MT $@ $(KERNEL_INCLUDE)
+KERNEL_SRCS += $(filter-out %main-arch.c, $(ARCH_SRCS))
+$(info $(KERNEL_SRCS))
+#arch: ARCH_SRCS+=arch-main.c

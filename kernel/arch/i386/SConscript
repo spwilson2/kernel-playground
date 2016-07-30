@@ -1,0 +1,12 @@
+Import('GlobalContext')
+GlobalContext.import_globals(globals())
+Glob('*.c')
+
+k_src += Glob('*.c')
+
+#TODO: Add way to autodetect and run instead of defining here.
+subbuilds = []
+#subbuilds += ['arch']
+
+for subbuild in subbuilds:
+        SConscript(join_path(subbuild,'SConscript'), duplicate=0)
